@@ -12,6 +12,11 @@ export class ProjectionApp extends gfx.GfxApp
 {
     private cameraControls: gfx.OrbitControls;
 
+    private nearClip: number;
+    private farClip: number;
+    private verticalFov: number;
+    private aspectRatio: number;
+
     private projectionMode: string;
 
     constructor()
@@ -19,6 +24,12 @@ export class ProjectionApp extends gfx.GfxApp
         super();
 
         this.cameraControls = new gfx.OrbitControls(this.camera); 
+
+        this.nearClip = 1;
+        this.farClip = 2000;
+
+        this.verticalFov = 60;
+        this.aspectRatio = 1.777;
 
         this.projectionMode = 'Perspective';
 
@@ -100,7 +111,19 @@ export class ProjectionApp extends gfx.GfxApp
 
     setCameraProjection(): void
     {
-        // To be added
+        const n = this.nearClip;
+        const f = this.farClip;
+        const top = n * Math.tan(gfx.MathUtils.degreesToRadians(this.verticalFov) / 2);
+        const bottom = -top;
+        const right = top * this.aspectRatio;
+        const left = -right;
+
+        this.camera.projectionMatrix.setRowMajor(
+            (2 * n) / (right - left), 0, (right + left) / (right - left), 0,
+            0, (2 * n) / (top - bottom), (top + bottom) / (top - bottom), 0,
+            0, 0, -(f + n) / (f - n), (-2 * f * n) / (f - n),
+            0, 0, -1, 0
+        );
 
         // Resize the viewport based on the camera aspect ratio
         this.resize();

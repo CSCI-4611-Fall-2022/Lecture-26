@@ -102,6 +102,18 @@ export class ProjectionApp extends gfx.GfxApp
         ]);
         projectionController.name('Projection');
         projectionController.onChange(()=>{ this.setCameraProjection() });
+
+        const nearClipController = gui.add(this, 'nearClip');
+        nearClipController.onChange(()=>{ this.setCameraProjection() });
+        
+        const farClipController = gui.add(this, 'farClip');
+        farClipController.onChange(()=>{ this.setCameraProjection() });
+
+        const fovController = gui.add(this, 'verticalFov');
+        fovController.onChange(()=>{ this.setCameraProjection() });
+
+        const aspectRatioController = gui.add(this, 'aspectRatio');
+        aspectRatioController.onChange(()=>{ this.setCameraProjection() });
     }
 
     update(deltaTime: number): void 
@@ -132,6 +144,6 @@ export class ProjectionApp extends gfx.GfxApp
     // Override the default resize event handler
     resize(): void
     {
-        this.renderer.resize(window.innerWidth, window.innerHeight, this.camera.getAspectRatio());
+        this.renderer.resize(window.innerWidth, window.innerHeight, this.aspectRatio);
     }
 }

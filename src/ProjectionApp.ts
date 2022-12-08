@@ -12,10 +12,17 @@ export class ProjectionApp extends gfx.GfxApp
 {
     private cameraControls: gfx.OrbitControls;
 
+    // Camera parameters
     private nearClip: number;
     private farClip: number;
+
+    // Perspective projection parameters
     private verticalFov: number;
     private aspectRatio: number;
+
+    // Orthographic projection parameters
+    private orthoWidth: number;
+    private orthoHeight: number;
 
     private projectionMode: string;
 
@@ -30,6 +37,9 @@ export class ProjectionApp extends gfx.GfxApp
 
         this.verticalFov = 60;
         this.aspectRatio = 1.777;
+
+        this.orthoWidth = 800;
+        this.orthoHeight = 450.196;
 
         this.projectionMode = 'Perspective';
 
@@ -109,11 +119,23 @@ export class ProjectionApp extends gfx.GfxApp
         const farClipController = gui.add(this, 'farClip');
         farClipController.onChange(()=>{ this.setCameraProjection() });
 
-        const fovController = gui.add(this, 'verticalFov');
+        const perspectiveControls = gui.addFolder('Perspective Camera Settings');
+        perspectiveControls.open();
+
+        const fovController = perspectiveControls.add(this, 'verticalFov');
         fovController.onChange(()=>{ this.setCameraProjection() });
 
-        const aspectRatioController = gui.add(this, 'aspectRatio');
+        const aspectRatioController = perspectiveControls.add(this, 'aspectRatio');
         aspectRatioController.onChange(()=>{ this.setCameraProjection() });
+
+        const orthographicControls = gui.addFolder('Orthographic Camera Settings');
+        orthographicControls.open(); 
+
+        const orthoWidthController = orthographicControls.add(this, 'orthoWidth');
+        orthoWidthController.onChange(()=>{ this.setCameraProjection() });
+
+        const orthoHeightController = orthographicControls.add(this, 'orthoHeight');
+        orthoHeightController.onChange(()=>{ this.setCameraProjection() });
     }
 
     update(deltaTime: number): void 
@@ -123,19 +145,26 @@ export class ProjectionApp extends gfx.GfxApp
 
     setCameraProjection(): void
     {
-        const n = this.nearClip;
-        const f = this.farClip;
-        const top = n * Math.tan(gfx.MathUtils.degreesToRadians(this.verticalFov) / 2);
-        const bottom = -top;
-        const right = top * this.aspectRatio;
-        const left = -right;
+        if(this.projectionMode == 'Perspective')
+        {
+            const n = this.nearClip;
+            const f = this.farClip;
+            const top = n * Math.tan(gfx.MathUtils.degreesToRadians(this.verticalFov) / 2);
+            const bottom = -top;
+            const right = top * this.aspectRatio;
+            const left = -right;
 
-        this.camera.projectionMatrix.setRowMajor(
-            (2 * n) / (right - left), 0, (right + left) / (right - left), 0,
-            0, (2 * n) / (top - bottom), (top + bottom) / (top - bottom), 0,
-            0, 0, -(f + n) / (f - n), (-2 * f * n) / (f - n),
-            0, 0, -1, 0
-        );
+            this.camera.projectionMatrix.setRowMajor(
+                (2 * n) / (right - left), 0, (right + left) / (right - left), 0,
+                0, (2 * n) / (top - bottom), (top + bottom) / (top - bottom), 0,
+                0, 0, -(f + n) / (f - n), (-2 * f * n) / (f - n),
+                0, 0, -1, 0
+            );
+        }
+        else
+        {
+            //
+        }
 
         // Resize the viewport based on the camera aspect ratio
         this.resize();

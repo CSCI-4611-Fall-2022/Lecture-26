@@ -140,7 +140,10 @@ export class ProjectionApp extends gfx.GfxApp
 
     update(deltaTime: number): void 
     {
-        this.cameraControls.update(deltaTime);
+        if(this.projectionMode != 'Isometric')
+        {
+            this.cameraControls.update(deltaTime);
+        }
     }
 
     setCameraProjection(): void
@@ -177,6 +180,21 @@ export class ProjectionApp extends gfx.GfxApp
 
             this.camera.projectionMatrix.setTranslation(translation);
             this.camera.projectionMatrix.premultiply(gfx.Matrix4.makeScale(scale));
+
+
+            // An isometric view uses an orthographic projection matrix and a specific viewing angle
+            // https://en.wikipedia.org/wiki/Isometric_projection
+
+            if(this.projectionMode == 'Isometric')
+            {
+                this.camera.position.set(0, 0, 0);
+                this.camera.rotation.setIdentity();
+
+                this.camera.rotateY(gfx.MathUtils.degreesToRadians(45));
+                this.camera.rotateX(gfx.MathUtils.degreesToRadians(-35.264)); 
+
+                this.camera.translateZ(550);
+            }
         }
 
         // Resize the viewport based on the camera aspect ratio
